@@ -4,7 +4,7 @@ import { StyleSheet, Switch, Text, View } from 'react-native';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false); // Bag-ong state para sa Dark Mode
+  const [isDarkMode, setIsDarkMode] = useState(false); 
 
   
   const backgroundColor = isDarkMode ? '#0F172A' : '#F8FAFC';

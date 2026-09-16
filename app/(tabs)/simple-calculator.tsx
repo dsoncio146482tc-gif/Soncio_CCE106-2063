@@ -8,7 +8,7 @@ export default function CalculatorScreen() {
 
   
   const calculate = (operator: string) => {
-    // 1. Validate empty inputs
+   
     if (num1.trim() === '' || num2.trim() === '') {
       setResult('Please enter both numbers!');
       return;
@@ -17,19 +17,19 @@ export default function CalculatorScreen() {
     const firstVal = parseFloat(num1);
     const secondVal = parseFloat(num2);
 
-    // 2. Validate invalid numeric input
+    
     if (isNaN(firstVal) || isNaN(secondVal)) {
       setResult('Invalid input! Enter valid numbers.');
       return;
     }
 
-    // 3. Prevent division by zero
+    
     if (operator === '/' && secondVal === 0) {
       setResult('Cannot divide by zero!');
       return;
     }
 
-    // Perform operations
+  
     let res = 0;
     switch (operator) {
       case '+':
@@ -53,7 +53,7 @@ export default function CalculatorScreen() {
     <View style={styles.container}>
       <Text style={styles.header}>Simple Calculator</Text>
 
-      {/* Inputs */}
+      
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -73,7 +73,7 @@ export default function CalculatorScreen() {
         />
       </View>
 
-      {/* Buttons (+ - * /) */}
+      
       <View style={styles.buttonRow}>
         <TouchableOpacity style={[styles.button, styles.btnBlue]} onPress={() => calculate('+')}>
           <Text style={styles.btnText}>+</Text>

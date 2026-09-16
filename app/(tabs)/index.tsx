@@ -1,82 +1,48 @@
+import { Link } from 'expo-router';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Link, useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+// Joined Events (Local Data)
+const JOINED_EVENTS = [
+  { id: '1', title: 'ML tournament', date: 'Sept 20, 2026', location: 'Lab 1', status: 'Confirmed' },
+];
 
-export default function HomeScreen() {
-  const router = useRouter();
-
-  const handleProgrammaticNavigate = (courseId: string) => {
-
-    router.push(`/course/${courseId}`);
-  };
-
+export default function DashboardScreen() {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>CCE106 Portal</Text>
-      <Text style={styles.subheader}>Welcome, Daniel Dave Soncio</Text>
+    <View style={styles.container}>
+      <Text style={styles.welcome}>Welcome back, Daniel!</Text>
+      <Text style={styles.subHeader}>Student ID: 146482</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Declarative Navigation </Text>
-       
-        <Link href="/course/CCE106" asChild>
-          <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Open Course </Text>
-          </Pressable>
-        </Link>
-        
-        
-        <Link href="/student/146482" asChild>
-          <Pressable style={{ ...styles.button, ...styles.secondaryButton }}>
-            <Text style={styles.buttonText}>Open Student </Text>
-          </Pressable>
-        </Link>
-      </View>
+      <Text style={styles.sectionHeader}>My Joined Events ({JOINED_EVENTS.length})</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Programmatic Navigation </Text>
-        
-        <Pressable
-          style={styles.button}
-          onPress={() => handleProgrammaticNavigate('CS101')}
-        >
-          <Text style={styles.buttonText}> Course IT/11</Text>
-        </Pressable>
-
-        
-        
-        <Pressable
-          style={{ ...styles.button, ...styles.invalidButton }}
-          onPress={() => handleProgrammaticNavigate('INVALID_ID')}
-        >
-          <Text style={styles.buttonText}>Test Invalid Parameter</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+      {JOINED_EVENTS.length > 0 ? (
+        <FlatList
+          data={JOINED_EVENTS}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Link href={`/event/${item.id}`} asChild>
+              <Pressable style={({ pressed }) => [styles.card, { opacity: pressed ? 0.7 : 1 }]}>
+                <Text style={styles.eventTitle}>{item.title}</Text>
+                <Text style={styles.eventSub}>{item.date} • {item.location}</Text>
+                <Text style={styles.status}>Status: {item.status}</Text>
+              </Pressable>
+            </Link>
+          )}
+        />
+      ) : (
+        <Text style={styles.emptyText}>You haven't joined any events yet.</Text>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#F8FAFC', flexGrow: 1 },
-  header: { fontSize: 24, fontWeight: 'bold', color: '#1E3A8A' },
-  subheader: { fontSize: 16, color: '#64748B', marginBottom: 20 },
-  card: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  cardTitle: { fontSize: 18, fontWeight: '600', color: '#0F172A', marginBottom: 6 },
-  cardDescription: { fontSize: 14, color: '#475569', marginBottom: 12 },
-  button: {
-    backgroundColor: '#1E3A8A',
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginVertical: 4,
-  },
-  secondaryButton: { backgroundColor: '#2563EB' },
-  invalidButton: { backgroundColor: '#DC2626' },
-  buttonText: { color: '#FFFFFF', fontWeight: '600' },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  welcome: { fontSize: 24, fontWeight: 'bold', color: '#111' },
+  subHeader: { fontSize: 14, color: '#666', marginBottom: 20 },
+  sectionHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  card: { padding: 15, borderRadius: 10, backgroundColor: '#eaf5ff', marginBottom: 10, borderWidth: 1, borderColor: '#b8daff' },
+  eventTitle: { fontSize: 16, fontWeight: 'bold', color: '#004085' },
+  eventSub: { fontSize: 13, color: '#555', marginTop: 4 },
+  status: { fontSize: 12, fontWeight: 'bold', color: '#28a745', marginTop: 8 },
+  emptyText: { color: '#888', fontStyle: 'italic', marginTop: 10 },
 });
