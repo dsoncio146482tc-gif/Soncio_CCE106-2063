@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Setters are reserved for the login exercise. */
+import { type User } from '@/context/AuthContext';
 import { useAuth } from '@/hooks/useAuth';
+import { getApiUrl } from '@/constants/api';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -15,7 +17,7 @@ export default function SignInScreen() {
 
   const handleLogin = async () => {
     // TODO EXAM: 1. Validate email and password.
-    if (!email.trim() || !password.trim()) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !password.trim()) {
       setError('Please enter both email and password.');
       return;
     }
@@ -25,37 +27,32 @@ export default function SignInScreen() {
     setError('');
 
     try {
-      // TODO EXAM: 3. POST to /login using fetch() and async/await.
-      // Adjust API endpoint URL if specified in your project constants or docs
-      const response = await fetch('https://reqres.in/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
+      // TODO EXAM: 3. Look up the user with GET /users?email= using fetch() and async/await.
+      const response = await fetch(getApiUrl(`/users?email=${encodeURIComponent(email.trim())}`));
 
       // TODO EXAM: 4. Check response.ok and parse the returned JSON.
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed. Please check your credentials.');
+        throw new Error('Unable to look up this account. Please try again.');
+      }
+      const data: unknown = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('The user lookup returned an invalid response.');
+      }
+      const userData = (data as User[]).find(
+        (account) => account.email?.toLowerCase() === email.trim().toLowerCase(),
+      );
+      if (!userData) {
+        throw new Error('No JSONPlaceholder user was found for that email.');
       }
 
-      // TODO EXAM: 5. Pass the returned access token and user to the context login().
-      const token = data.token || 'sample-auth-token';
-      const userData = { email: email.trim(), name: 'Student' };
-
-      await login(token, userData);
+      // TODO EXAM: 5. Generate a local mock token and pass it with the user to context login().
+      await login(userData);
 
       // TODO EXAM: 6. Navigate using router.replace() after successful authentication.
       router.replace('/(app)');
-    } catch (err: any) {
+    } catch (err: unknown) {
       // TODO EXAM: 7. Handle login errors and stop loading in finally.
-      setError(err.message || 'An error occurred during sign in.');
+      setError(err instanceof Error ? err.message : 'An error occurred during sign in.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +75,7 @@ export default function SignInScreen() {
         <Pressable accessibilityRole="button" style={styles.button} onPress={handleLogin} disabled={loading}>
           <Text style={styles.buttonText}>{loading ? 'Signing in…' : 'Login'}</Text>
         </Pressable>
-        <Text style={styles.note}>Exam starter: login is not implemented yet.</Text>
+        <Text style={styles.note}>Mock login: use a JSONPlaceholder user email and any non-empty password.</Text>
       </View>
     </ScrollView>
   );
