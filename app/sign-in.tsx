@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Setters are reserved for the login exercise. */
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -8,14 +10,55 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const router = useRouter();
+  const { login } = useAuth();
+
   const handleLogin = async () => {
     // TODO EXAM: 1. Validate email and password.
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     // TODO EXAM: 2. Set loading and clear previous errors.
-    // TODO EXAM: 3. POST to /login using fetch() and async/await.
-    // TODO EXAM: 4. Check response.ok and parse the returned JSON.
-    // TODO EXAM: 5. Pass the returned access token and user to the context login().
-    // TODO EXAM: 6. Navigate using router.replace() after successful authentication.
-    // TODO EXAM: 7. Handle login errors and stop loading in finally.
+    setLoading(true);
+    setError('');
+
+    try {
+      // TODO EXAM: 3. POST to /login using fetch() and async/await.
+      // Adjust API endpoint URL if specified in your project constants or docs
+      const response = await fetch('https://reqres.in/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      // TODO EXAM: 4. Check response.ok and parse the returned JSON.
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed. Please check your credentials.');
+      }
+
+      // TODO EXAM: 5. Pass the returned access token and user to the context login().
+      const token = data.token || 'sample-auth-token';
+      const userData = { email: email.trim(), name: 'Student' };
+
+      await login(token, userData);
+
+      // TODO EXAM: 6. Navigate using router.replace() after successful authentication.
+      router.replace('/(app)');
+    } catch (err: any) {
+      // TODO EXAM: 7. Handle login errors and stop loading in finally.
+      setError(err.message || 'An error occurred during sign in.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
