@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- State setters and loader are exam placeholders. */
 import StudentCard, { type Student } from '@/components/StudentCard';
-import { API_BASE_URL } from '@/constants/api';
+import { getApiUrl } from '@/constants/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -21,7 +21,7 @@ export default function StudentsScreen() {
     try {
       // TODO EXAM: 2. Call GET /students using fetch() and async/await.
       // TODO EXAM: 3. Include Authorization: Bearer TOKEN from useAuth() if required.
-      const response = await fetch(`${API_BASE_URL}/students`, {
+      const response = await fetch(getApiUrl('/users'), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,16 @@ export default function StudentsScreen() {
 
       // TODO EXAM: 5. Parse JSON and save the student array to state.
       const data = await response.json();
-      const list = Array.isArray(data) ? data : data.data || [];
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data.students)
+            ? data.students
+            : null;
+      if (!list) {
+        throw new Error('The students response did not contain a student list.');
+      }
       setStudents(list);
     } catch (err: any) {
       // TODO EXAM: 6. Handle errors and stop loading inside finally.
