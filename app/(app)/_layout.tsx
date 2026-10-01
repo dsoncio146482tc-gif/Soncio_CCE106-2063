@@ -1,12 +1,12 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Redirect, Tabs } from 'expo-router';
-import { ActivityIndicator, View } from 'react_native';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function AppLayout() {
-  const { token, isLoading } = useAuth();
+  const { token, authLoading } = useAuth();
 
   // TODO EXAM: Check authentication and session restoration before showing the tabs.
-  if (isLoading) {
+  if (authLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#245bb2" />

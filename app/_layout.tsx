@@ -1,14 +1,20 @@
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function RootLayoutNav() {
-  const { token, isLoading } = useAuth();
+  const { token, authLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || authLoading) return;
 
     const inAuthGroup = segments[0] === '(app)' || segments[0] === 'student';
 
@@ -18,7 +24,7 @@ function RootLayoutNav() {
     } else if (token && segments[0] === 'sign-in') {
       router.replace('/(app)');
     }
-  }, [token, isLoading, segments]);
+  }, [token, authLoading, segments, isMounted]);
 
   return (
     <Stack screenOptions={{ headerTintColor: '#17324d' }}>
