@@ -4,11 +4,11 @@
 
 ### Student Information
 
-Name:
+Name: SONCIO, DANIEL DAVE V.
 
-Section:
+Section: 2063
 
-Date:
+Date: 10/2/2026
 
 ### Required Features
 
